@@ -1,0 +1,24 @@
+name: Gateway-23 literature miner
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 8 * * *"
+permissions:
+  contents: read
+jobs:
+  mine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Collect Crossref research metadata
+        run: python miner.py
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: gateway23-research
+          path: data/research.csv
+          retention-days: 30
