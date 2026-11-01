@@ -2,7 +2,7 @@ name: Gateway-23 literature miner
 on:
   workflow_dispatch:
   schedule:
-    - cron: "17 8 * * *"
+    - cron: "7,37 * * * *"
 permissions:
   contents: read
 jobs:
