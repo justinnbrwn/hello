@@ -2,7 +2,6 @@
 """Gateway-23 literature metadata miner; standard library only."""
 import csv
 import json
-import os
 import time
 import urllib.parse
 import urllib.request
@@ -49,6 +48,8 @@ def main():
                     continue
                 parts = item.get("published", {}).get("date-parts", [[]])
                 year = parts[0][0] if parts and parts[0] else ""
+                if doi in records:
+                    continue
                 records[doi] = {
                     "doi": doi, "title": (item.get("title") or [""])[0],
                     "year": year, "query": query, "source": "Crossref",
