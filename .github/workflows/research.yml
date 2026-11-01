@@ -4,19 +4,37 @@ on:
   schedule:
     - cron: "7,37 * * * *"
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: gateway23-miner-main
+  cancel-in-progress: false
 jobs:
   mine:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Collect Crossref research metadata
+      - name: Synchronize cumulative database
+        run: git pull --ff-only origin main
+      - name: Collect and merge Crossref research metadata
         run: python miner.py
-      - name: Upload results
+      - name: Persist cumulative database
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/research.csv
+          if git diff --cached --quiet; then
+            echo "No new research records."
+          else
+            git commit -m "Update Gateway-23 cumulative research dataset"
+            git push origin HEAD:main
+          fi
+      - name: Upload current database snapshot
         uses: actions/upload-artifact@v4
         with:
           name: gateway23-research
