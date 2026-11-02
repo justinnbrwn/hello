@@ -1,0 +1,39 @@
+name: Gateway-23 focused wormhole literature audit
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 9 * * *"
+permissions:
+  contents: write
+concurrency:
+  group: gateway23-focused-audit
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Sync current branch
+        run: git pull --ff-only origin main
+      - name: Search focused literature
+        run: python wormhole_audit.py
+      - name: Commit metadata and status
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/wormhole_literature.csv data/wormhole_audit_status.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Update focused wormhole literature metadata"
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gateway23-wormhole-literature
+          path: |
+            data/wormhole_literature.csv
+            data/wormhole_audit_status.json
+          retention-days: 30
