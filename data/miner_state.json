@@ -1,6 +1,6 @@
 {
-  "next_query": 256,
+  "next_query": 260,
   "query_count": 1000,
-  "last_run_utc": "2026-11-19T07:51:32.815227+00:00",
-  "failures": 1
+  "last_run_utc": "2026-11-19T17:17:51.477579+00:00",
+  "failures": 3
 }
